@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link href="assets/css/custom.css" rel="stylesheet">
+	</link>
+	<title><?php echo $xlsx->getCell(0, 'A2'); ?></title>
+</head>
+
+<body>
+	<div class="container-fluid titul">
+		<div class="row">
+			<div class="col mx-1 my-2">
+				<h5 class="mx-1 my-2">Затверджую:</h5>
+				<h5 class="mx-1 my-2">Начальник СП</h5>
+				<h5 class="mx-1 my-2">_____________ В.В. ШЕРСТЮК</h5>
+				<h5 class="mx-1 my-2"><?php echo date('d.m.Y'); ?> року</h5>
+			</div>
+			<div class="col mx-1 my-2 text-end">
+				<img src="assets/images/logo.png" width="100" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="col mx-1 my-2">
+				<br /><br /><br /><br /><br />
+				<h1 class="text-center">ПрАТ "Кіровоградобленерго"</h1>
+				<h2 class="text-center">ПАСПОРТ ПІДСТАНЦІЇ</h2>
+				<h3 class="text-center"><?php echo $objects[$_GET['object']]; ?></h3>
+				<h4 class="text-center"><?php echo $objects_address[$_GET['object']]; ?></h4>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col mx-1 my-2">
+				<?php foreach ($tables as $key => $rows) : ?>
+					<div class="titul">
+						<div class="table-responsive">
+							<table class="table able-striped able-hover table-bordered table-sm">
+								<?php foreach ($rows as $k => $row) : ?>
+									<?php if ($k == 0) : ?>
+										<thead>
+											<tr class="text-center">
+												<th colspan="<?php echo count($rows[0]); ?>">
+													<h6><?php echo $key + 1; ?>. <?php echo isset($table_name) ? $table_name[$key] : $xlsx->sheetName($key); ?></h6>
+												</th>
+											</tr>
+											<tr class="text-center">
+												<?php foreach ($row as $td) : ?>
+													<th><?php echo $td; ?></th>
+												<?php endforeach; ?>
+											</tr>
+										</thead>
+									<?php else : ?>
+										<tbody>
+											<tr class="text-center cursor" onClick="hiddenRowPrint(event);">
+												<?php foreach ($row as $td) : ?>
+													<td><?php echo $td ? $td : "&nbsp;"; ?></td>
+												<?php endforeach; ?>
+											</tr>
+										</tbody>
+									<?php endif; ?>
+								<?php endforeach; ?>
+							</table>
+						</div>
+						<div class="row mt-5 d-none d-print-flex">
+							<div class="col-3"></div>
+							<div class="col-3"><?php echo $users_position[$_GET['object']]; ?></div>
+							<div class="col-1"></div>
+							<div class="col-5"><?php echo $users_name[$_GET['object']]; ?></div>
+						</div>
+						<hr />
+						<div class="table-responsive d-none d-print-bloc">
+							<?php if ($key !== count($expl_ved)) :  ?>
+								<table class="table able-striped able-hover table-bordered table-sm">
+									<thead>
+										<tr class="text-center">
+											<th colspan="<?php echo count($rows[0]); ?>">
+												<h6>Експлуатаційна відомість (<?php echo isset($table_name) ? $table_name[$key] : $xlsx->sheetName($key); ?>)</h6>
+											</th>
+										</tr>
+										<tr class="text-center">
+											<th style="width: 10%;">Дата</th>
+											<!-- <th style="width: 10%;"></th> -->
+											<th style="width: 75%;">Дані про пошкодження, ремонти, випробування, чищення, результати огляду, відбори проб масла</th>
+											<th style="width: 15%;">Викованець</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php for ($i = 0; $i < 5; $i++) : ?>
+											<tr class="text-center">
+												<td>&nbsp;</td>
+												<!-- <td>&nbsp;</td> -->
+												<td>&nbsp;</td>
+												<td>&nbsp;</td>
+											</tr>
+										<?php endfor; ?>
+									</tbody>
+								</table>
+							<?php endif;  ?>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="container-fluid">
+		<div class="row my-5">
+			<div class="col-3"></div>
+			<div class="col-3"><?php //echo $users_position[$_GET['object']]; 
+								?></div>
+			<div class="col-1"></div>
+			<div class="col-5"><?php //echo $users_name[$_GET['object']]; 
+								?></div>
+		</div>
+	</div> -->
+	<script>
+		function hiddenRowPrint(event) {
+			event.target.parentElement.classList.toggle("d-print-none");
+			event.target.parentElement.classList.toggle("bg-info");
+		}
+	</script>
+</body>
+
+</html>

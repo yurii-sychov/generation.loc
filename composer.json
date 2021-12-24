@@ -1,0 +1,7 @@
+{
+    "require": {
+        "shuchkin/simplexlsx": "^0.8.29",
+        "phpoffice/phpexcel": "^1.8",
+        "shuchkin/simplexlsxgen": "^1.0"
+    }
+}

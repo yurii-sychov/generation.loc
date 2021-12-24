@@ -1,0 +1,26 @@
+table {
+    font-size: 12px;
+    line-height: 2;
+ }
+
+ .titul {
+    page-break-after: always;
+ }
+
+ .cursor {
+   cursor: pointer
+ }
+
+ .rotated {
+  transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+   height: 120px;
+   white-space: nowrap
+ }
+
+@page {
+  /* size: A3 landscape;
+  margin: 20px 20px 20px 20px; */
+}
