@@ -81,6 +81,11 @@ foreach ($data as $key => $value) {
             $sql = "INSERT INTO `specific_renovation_objects` (`id`, `subdivision_id`, `complete_renovation_object_id`, `name`, `year_commissioning`, `equipment_id`, `voltage_class_id`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '{$specific_renovation_objects['subdivision_id']}', '{$specific_renovation_objects['complete_renovation_object_id']}', '{$specific_renovation_objects['name']}', NULL, {$specific_renovation_objects['equipment_id']}, '{$specific_renovation_objects['voltage_class_id']}', '{$specific_renovation_objects['created_by']}', '{$specific_renovation_objects['updated_by']}', '{$specific_renovation_objects['created_at']}', '{$specific_renovation_objects['updated_at']}')";
             $mysqli->query($sql);
             $specific_renovation_object_id = $mysqli->insert_id;
+
+            for ($i = 1; $i <= 3; $i++) {
+                $query = "INSERT INTO `schedules` (`id`, `specific_renovation_object_id`, `type_service_id`, `periodicity`, `date_last_service`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '$specific_renovation_object_id', '$i', NULL, NULL, 0, '{$specific_renovation_objects['created_by']}', '{$specific_renovation_objects['updated_by']}', '{$specific_renovation_objects['created_at']}', '{$specific_renovation_objects['updated_at']}')";
+                $mysqli->query($query);
+            }
         }
 
         if (isset($specific_renovation_object_id)) {
