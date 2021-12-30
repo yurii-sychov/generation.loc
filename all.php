@@ -22,22 +22,25 @@ $places = $mysqli->query("SELECT * FROM places")->fetch_all(MYSQLI_ASSOC);
 
 $voltage_class = $mysqli->query("SELECT * FROM voltage_class")->fetch_all(MYSQLI_ASSOC);
 
-// echo "<pre>";
-// print_r($voltage_class);
-// echo "</pre>";
+$insulation_type = $mysqli->query("SELECT * FROM insulation_type")->fetch_all(MYSQLI_ASSOC);
 
 
 $data = SimpleXLSX::parse('input_data/all/all.xlsx')->rows(0);
 
-$vid  = array_column($data, 1);
+// echo "<pre>";
+// print_r($data);
+// echo "</pre>";
 
-$disp  = array_column($data, 2);
+// $vid  = array_column($data, 1);
 
-array_multisort($vid, SORT_ASC, SORT_LOCALE_STRING, $disp, SORT_ASC, SORT_LOCALE_STRING, $data);
+// $disp  = array_column($data, 2);
+
+// array_multisort($vid, SORT_ASC, SORT_LOCALE_STRING, $disp, SORT_ASC, SORT_LOCALE_STRING, $data);
 
 $new_array = [];
 
 foreach ($data as $key => $value) {
+    $messages = [];
     if ($key > 0) {
         $specific_renovation_objects['subdivision_id'] = 1;
         $passports['subdivision_id'] = 1;
@@ -81,11 +84,13 @@ foreach ($data as $key => $value) {
             $sql = "INSERT INTO `specific_renovation_objects` (`id`, `subdivision_id`, `complete_renovation_object_id`, `name`, `year_commissioning`, `equipment_id`, `voltage_class_id`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '{$specific_renovation_objects['subdivision_id']}', '{$specific_renovation_objects['complete_renovation_object_id']}', '{$specific_renovation_objects['name']}', NULL, {$specific_renovation_objects['equipment_id']}, '{$specific_renovation_objects['voltage_class_id']}', '{$specific_renovation_objects['created_by']}', '{$specific_renovation_objects['updated_by']}', '{$specific_renovation_objects['created_at']}', '{$specific_renovation_objects['updated_at']}')";
             $mysqli->query($sql);
             $specific_renovation_object_id = $mysqli->insert_id;
+            $messages['specific_renovation_objects'] = 'Доданий запис з id=' . $specific_renovation_object_id . ' в таблицю specific_renovation_objects!';
 
             for ($i = 1; $i <= 3; $i++) {
-                $query = "INSERT INTO `schedules` (`id`, `specific_renovation_object_id`, `type_service_id`, `periodicity`, `date_last_service`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '$specific_renovation_object_id', '$i', NULL, NULL, 0, '{$specific_renovation_objects['created_by']}', '{$specific_renovation_objects['updated_by']}', '{$specific_renovation_objects['created_at']}', '{$specific_renovation_objects['updated_at']}')";
+                $query = "INSERT INTO `schedules` (`id`, `specific_renovation_object_id`, `type_service_id`, `periodicity`, `year_last_service`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '$specific_renovation_object_id', '$i', NULL, NULL, 0, '{$specific_renovation_objects['created_by']}', '{$specific_renovation_objects['updated_by']}', '{$specific_renovation_objects['created_at']}', '{$specific_renovation_objects['updated_at']}')";
                 $mysqli->query($query);
             }
+            $messages['schedules'] = 'Додані 3 записи в таблицю schedules!';
         }
 
         if (isset($specific_renovation_object_id)) {
@@ -103,6 +108,14 @@ foreach ($data as $key => $value) {
                     $passports['place_id'] = $v['id'];
                 }
             }
+
+            $passports['insulation_type_id'] = '';
+            foreach ($insulation_type as $k => $v) {
+                if ($v['insulation_type'] === $value[9]) {
+                    $passports['insulation_type_id'] = $v['id'];
+                }
+            }
+
             $passports['type'] = $value[4];
             $passports['number'] = $value[5];
             $passports['production_date'] = $value[6] ? $value[6] . '-12-30' : 'NULL';
@@ -111,12 +124,12 @@ foreach ($data as $key => $value) {
             $passports['created_at'] = date('Y-m-d H:i:s');
             $passports['updated_at'] = date('Y-m-d H:i:s');
 
-            $sql = "INSERT INTO `passports` (`id`, `subdivision_id`, `complete_renovation_object_id`, `specific_renovation_object_id`, `place_id`, `type`, `production_date`, `number`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '{$passports['subdivision_id']}', '{$passports['complete_renovation_object_id']}', '{$specific_renovation_object_id}', '{$passports['place_id']}', '{$passports['type']}', '{$passports['production_date']}', '{$passports['number']}', '{$passports['created_by']}', '{$passports['updated_by']}', '{$passports['created_at']}', '{$passports['updated_at']}')";
+            $sql = "INSERT INTO `passports` (`id`, `subdivision_id`, `complete_renovation_object_id`, `specific_renovation_object_id`, `place_id`, `insulation_type_id`, `type`, `production_date`, `number`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES (NULL, '{$passports['subdivision_id']}', '{$passports['complete_renovation_object_id']}', '{$specific_renovation_object_id}', '{$passports['place_id']}', '{$passports['insulation_type_id']}', '{$passports['type']}', '{$passports['production_date']}', '{$passports['number']}', '{$passports['created_by']}', '{$passports['updated_by']}', '{$passports['created_at']}', '{$passports['updated_at']}')";
             $mysqli->query($sql);
+            $messages['passport'] = 'Доданий запис в таблицю passport!';
         }
 
-
-        array_push($new_array, ['specific_renovation_objects' => $specific_renovation_objects, 'passpports' => $passports]);
+        array_push($new_array, ['specific_renovation_objects' => $specific_renovation_objects, 'passpports' => $passports, 'messages' => $messages]);
     }
 }
 
